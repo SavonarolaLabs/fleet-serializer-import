@@ -8,7 +8,7 @@
     let currentTx = ""
     let newBoxId=""
     let newBox = {a:"111"}
-    let newBoxText=JSON.stringify(newBox)
+    let newBoxText=""
     const tokenId = "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
     const boxId = 'f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938'
     const price = 1_000_000_000n
@@ -18,11 +18,21 @@
 
     async function doStuff() {
         contract = compileSellContract();
+        loadBox();
         //"https://testnet.ergoplatform.com/en/addresses/"+
         //sendToken();
         //receiveToken();
     }
-
+    function loadBox(){
+        const x=localStorage.getItem("contract_box")
+        if (x){
+            newBoxText=x
+            newBox=JSON.parse(newBoxText)
+        }
+    }
+    function saveBox(){
+        localStorage.setItem("contract_box",newBoxText)
+    }
     async function receiveToken() {
         await ergoConnector.nautilus.connect();
         const me = await ergo.get_change_address();
@@ -48,6 +58,7 @@
         console.log(signed)
         newBox = signed.outputs[0]
         newBoxText=JSON.stringify(newBox)
+        saveBox()
         console.log(txId)
         currentTx = txId
     }
@@ -58,6 +69,7 @@
     async function pasteBoxName(){
         newBoxText = await navigator.clipboard.readText()
         newBox=JSON.parse(newBoxText)
+        saveBox()
     }
 
 
