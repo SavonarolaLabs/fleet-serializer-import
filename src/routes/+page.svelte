@@ -3,6 +3,7 @@
     import { onMount } from "svelte";
     import { sellTx } from "../erg-contracts/sendToContract";
     import { buyTx, getBox } from "../erg-contracts/buyFromContract";
+  import { cancelTx } from "../erg-contracts/cancelSaleOrder";
 
     let contract:string='';
     let currentTx = ""
@@ -33,6 +34,7 @@
     function saveBox(){
         localStorage.setItem("contract_box",newBoxText)
     }
+
     async function receiveToken() {
         await ergoConnector.nautilus.connect();
         const me = await ergo.get_change_address();
@@ -62,6 +64,24 @@
         console.log(txId)
         currentTx = txId
     }
+ 
+    async function cancellTokenSell() {
+        await ergoConnector.nautilus.connect();
+        const me = await ergo.get_change_address();
+        const utxos = await ergo.get_utxos();
+        const height = await ergo.get_current_height();
+        const tx = cancelTx(newBox, me, height);
+        console.log(tx);
+        const signed = await ergo.sign_tx(tx);
+        const txId = await ergo.submit_tx(signed);
+        console.log(signed)
+        newBox = signed.outputs[0]
+        newBoxText=JSON.stringify(newBox)
+        saveBox()
+        console.log(txId)
+        currentTx = txId
+    }
+
 
     function copyBoxName(){
         navigator.clipboard.writeText(JSON.stringify(newBox))
