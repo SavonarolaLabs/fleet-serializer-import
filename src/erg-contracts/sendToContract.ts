@@ -2,9 +2,9 @@ import { first } from "@fleet-sdk/common";
 import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { SGroupElement, SLong, SSigmaProp } from "@fleet-sdk/serializer";
 
-export function sellTx(contract: string, senderBase58PK: string, tokenId: string, utxos: Array<any>, height: number): any{
+export function sellTx(contract: string, senderBase58PK: string, tokenId: string, utxos: Array<any>, height: number,dev:string): any{
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
-
+    const devAddr = ErgoAddress.fromBase58(dev)
     const output = new OutputBuilder(
         SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE * 2n,
         contract
@@ -13,7 +13,8 @@ export function sellTx(contract: string, senderBase58PK: string, tokenId: string
         amount: "1" 
     }]).setAdditionalRegisters({
         R4: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex(),
-        R5: SLong(1_000_000_000n).toHex()
+        R5: SLong(1_000_000_000n).toHex(),
+        R6: SSigmaProp(SGroupElement(first(devAddr.getPublicKeys()))).toHex(),
     });
 
     const unsignedMintTransaction = new TransactionBuilder(height)
