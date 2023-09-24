@@ -13,7 +13,8 @@
 
     async function doStuff() {
         contract = compileSellContract();
-        sendToken();
+        //"https://testnet.ergoplatform.com/en/addresses/"+
+        //sendToken();
         //receiveToken();
     }
     async function receiveToken() {
@@ -41,4 +42,4 @@
     }
 </script>
 
-Sell Contract: {contract}
+<a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{"https://testnet.ergoplatform.com/en/addresses/"+contract}</a>
