@@ -3,7 +3,7 @@ import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VAL
 import { SGroupElement, SSigmaProp } from "@fleet-sdk/serializer";
 import { getBoxById } from "./box";
 
-export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number): any{
+export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number,tokenPrice:bigint,sellerBase58PK:string): any{
     const buyBox = await getBoxById(buyBoxId);
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
 
@@ -15,9 +15,15 @@ export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: s
         amount: "1" 
     }]);
 
+    const seller = new OutputBuilder(
+        tokenPrice,
+        sellerBase58PK
+    )
+
+
     const unsignedMintTransaction = new TransactionBuilder(height)
-        .from([buyBox ]) //,...utxos
-        .to(output)
+        .from([buyBox,...utxos ])
+        .to([output,seller])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
