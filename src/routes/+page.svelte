@@ -4,6 +4,7 @@
     import { sellTx } from "../erg-contracts/sendToContract";
     import { buyTx, getBox } from "../erg-contracts/buyFromContract";
   import { cancelTx } from "../erg-contracts/cancelSaleOrder";
+  import { mintTokenTx } from "../erg-contracts/mint";
 
     let contract:string='';
     let currentTx = ""
@@ -84,6 +85,23 @@
     }
 
 
+
+    async function mintToken(){
+        await ergoConnector.nautilus.connect();
+        const me = await ergo.get_change_address();
+        const utxos = await ergo.get_utxos();
+        const height = await ergo.get_current_height();
+        const tokenName = "turbo ergo"
+        const amount = 1000n
+        const tx = await mintTokenTx(tokenName, amount, me, utxos, height);
+        console.log(tx);
+        const signed = await ergo.sign_tx(tx);
+        const txId = await ergo.submit_tx(signed);
+        console.log(signed)
+        console.log(txId)
+        currentTx = txId
+    }
+
     function copyBoxName(){
         navigator.clipboard.writeText(JSON.stringify(newBox))
     }
@@ -92,7 +110,6 @@
         newBox=JSON.parse(newBoxText)
         saveBox()
     }
-
 
 </script>
 <div>active contract:<a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{contract}</a></div>
@@ -105,3 +122,4 @@
 <textarea name="" id="111" cols="30" rows="10" bind:value={newBoxText}></textarea>
 <button on:click={copyBoxName}>copy</button>
 <button on:click={pasteBoxName}>paste</button>
+<div><button on:click={mintToken}>mint token</button></div>
