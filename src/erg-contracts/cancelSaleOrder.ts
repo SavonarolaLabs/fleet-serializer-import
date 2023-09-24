@@ -11,7 +11,7 @@ export async function cancelTx(buyBox:object, sellerBase58PK: string, height: nu
         sellerBase58PK
     ).addTokens(buyBox.assets)
     .setAdditionalRegisters({
-        R4: SColl(SByte, stringToBytes("utf8", buyBox.id)).toHex(),
+        R4: SColl(SByte, buyBox.boxId).toHex(),
     });
 
     const unsignedMintTransaction = new TransactionBuilder(height)
