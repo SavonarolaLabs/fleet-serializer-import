@@ -9,7 +9,7 @@ export async function buyTx(buyBox:object, senderBase58PK: string, tokenId: stri
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
 
     const seller = new OutputBuilder(
-        tokenPrice,
+        tokenPrice-tokenPrice/100n,
         sellerBase58PK
     )
     .setAdditionalRegisters({
