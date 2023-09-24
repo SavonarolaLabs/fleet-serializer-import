@@ -41,7 +41,7 @@
         const me = await ergo.get_change_address();
         const utxos = await ergo.get_utxos();
         const height = await ergo.get_current_height();
-        const tx = await buyTx(newBox, me, tokenId, utxos, height,price,seller);
+        const tx = await buyTx(newBox, me, tokenId, utxos, height,price,seller,dev);
         //const tx = await getBox(boxId, me, tokenId, utxos, height);
         console.log(tx);
         const signed = await ergo.sign_tx(tx);
