@@ -6,8 +6,9 @@
 
     let contract:string='';
     let currentTx = ""
+    let newBoxId=""
     const tokenId = "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
-    const boxId = 'a6ca44bf4bc40ee4d9f70ef7f3fc9f080a4e73ffe89edfd2ddcccc78b7a8db6c'
+    const boxId = 'e4847321f9f4bcd6e8e12fcbf507b30821150df66ad0cf8e74840a07707220ee'
     const price = 1_000_000_000n
     const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"
 
@@ -42,6 +43,8 @@
         console.log(tx);
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
+        console.log(signed)
+        newBoxId = signed.outputs[0].boxId
         console.log(txId)
         currentTx = txId
     }
@@ -50,3 +53,4 @@
 <div><button on:click={sendToken}>sendToken</button></div>
 <div><button on:click={receiveToken}>receiveToken</button></div>
 <div><a target="_blank" href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}>{"https://testnet.ergoplatform.com/en/transactions/"+currentTx}</a></div>
+<div>new box id = {newBoxId}</div>
