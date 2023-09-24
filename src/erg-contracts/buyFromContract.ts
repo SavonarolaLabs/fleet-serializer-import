@@ -3,8 +3,8 @@ import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VAL
 import { SGroupElement, SSigmaProp } from "@fleet-sdk/serializer";
 import { getBoxById } from "./box";
 
-export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number,tokenPrice:bigint,sellerBase58PK:string): any{
-    const buyBox = await getBoxById(buyBoxId);
+export async function buyTx(buyBox:object, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number,tokenPrice:bigint,sellerBase58PK:string): any{
+    //const buyBox = await getBoxById(buyBoxId);
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
 
     const output = new OutputBuilder(
