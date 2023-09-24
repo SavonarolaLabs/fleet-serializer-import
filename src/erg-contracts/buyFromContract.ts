@@ -16,10 +16,10 @@ export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: s
     }]);
 
     const unsignedMintTransaction = new TransactionBuilder(height)
-        .from([buyBox, ...utxos])
+        .from([buyBox ]) //,...utxos
         .to(output)
         .sendChangeTo(myAddr)
-        .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
+        .payFee(RECOMMENDED_MIN_FEE_VALUE)
         .build()
         .toEIP12Object();
 
