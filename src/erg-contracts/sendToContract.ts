@@ -2,19 +2,14 @@ import { first } from "@fleet-sdk/common";
 import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { SGroupElement, SLong, SSigmaProp } from "@fleet-sdk/serializer";
 
-export function sellTx(contract: string, senderBase58PK: string, tokenId: string, utxos: Array<any>, height: number,dev:string): any{
+export function sellTx(contract: string, senderBase58PK: string, tokenId: string, utxos: Array<any>, height: number,dev:string, assets:Array<any>): any{
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
     const devAddr = ErgoAddress.fromBase58(dev)
     const output = new OutputBuilder(
         SAFE_MIN_BOX_VALUE + RECOMMENDED_MIN_FEE_VALUE * 2n,
         contract
-    ).addTokens([{ 
-        tokenId: tokenId, 
-        amount: "1" 
-    }]).addTokens([{ 
-        tokenId: "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45", 
-        amount: "5" 
-    }]).setAdditionalRegisters({
+    ).addTokens(assets)
+    .setAdditionalRegisters({
         R4: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex(),
         R5: SLong(1_000_000_000n).toHex(),
         R6: SSigmaProp(SGroupElement(first(devAddr.getPublicKeys()))).toHex(),
