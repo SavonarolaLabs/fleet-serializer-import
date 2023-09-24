@@ -6,7 +6,8 @@
 
     let contract:string='';
     const tokenId = "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
-    const boxId = '71e768dd2278e5acfb45560aeff26ae5cef51cd9df0bd490bce57b349f0bedde'
+    const boxId = '1531b63ac1fb483b2c3c49c63c583b6be2f5eb608459eeafaf00c335be0cb2ab'
+    let currentTx = ""
     //const boxId = 'a8fea293382d8a4a2ed4aa2f355c3ed6e4705a3ff0ddf69f011aa7d277ee4c36'
 
     onMount(doStuff);
@@ -17,6 +18,7 @@
         //sendToken();
         //receiveToken();
     }
+
     async function receiveToken() {
         await ergoConnector.nautilus.connect();
         const me = await ergo.get_change_address();
@@ -28,6 +30,7 @@
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
         console.log(txId)
+        currentTx = txId
     }
     async function sendToken() {
         await ergoConnector.nautilus.connect();
@@ -39,7 +42,10 @@
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
         console.log(txId)
+        currentTx = txId
     }
 </script>
-
-<a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{"https://testnet.ergoplatform.com/en/addresses/"+contract}</a>
+<div><button on:click={sendToken}>sendToken</button></div>
+<div><button on:click={receiveToken}>receiveToken</button></div>
+<div><a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{"https://testnet.ergoplatform.com/en/addresses/"+contract}</a></div>
+<div><a target="_blank" href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}>{"https://testnet.ergoplatform.com/en/transactions/"+currentTx}</a></div>
