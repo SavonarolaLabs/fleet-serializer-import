@@ -70,7 +70,7 @@
         const me = await ergo.get_change_address();
         const utxos = await ergo.get_utxos();
         const height = await ergo.get_current_height();
-        const tx = cancelTx(newBox, me, height);
+        const tx = await cancelTx(newBox, me, height);
         console.log(tx);
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
@@ -98,6 +98,7 @@
 <div><button on:click={sendToken}>sendToken</button></div>
 <div><button on:click={receiveToken}>receiveToken</button></div>
 <div><button on:click={cancelTokenSell}>cancelSellToken</button></div>
+
 <div><a target="_blank" href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}>{"https://testnet.ergoplatform.com/en/transactions/"+currentTx}</a></div>
 <div>new box id = {newBoxId}</div>
 <textarea name="" id="111" cols="30" rows="10" bind:value={newBoxText}></textarea>
