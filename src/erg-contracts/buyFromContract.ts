@@ -23,7 +23,7 @@ export async function buyTx(buyBoxId: string, senderBase58PK: string, tokenId: s
 
     const unsignedMintTransaction = new TransactionBuilder(height)
         .from([buyBox,...utxos ])
-        .to([output,seller])
+        .to([seller,output])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
