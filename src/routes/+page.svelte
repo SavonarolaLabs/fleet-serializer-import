@@ -14,6 +14,7 @@
     const boxId = 'f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938'
     const price = 1_000_000_000n
     const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"
+    const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib"
 
     onMount(doStuff);
 
@@ -53,7 +54,7 @@
         const me = await ergo.get_change_address();
         const utxos = await ergo.get_utxos();
         const height = await ergo.get_current_height();
-        const tx = sellTx(contract, me, tokenId, utxos, height);
+        const tx = sellTx(contract, me, tokenId, utxos, height,dev);
         console.log(tx);
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
