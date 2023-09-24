@@ -7,8 +7,10 @@
     let contract:string='';
     let currentTx = ""
     let newBoxId=""
+    let newBox = {a:"111"}
+    let newBoxText=JSON.stringify(newBox)
     const tokenId = "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
-    const boxId = 'e4847321f9f4bcd6e8e12fcbf507b30821150df66ad0cf8e74840a07707220ee'
+    const boxId = 'f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938'
     const price = 1_000_000_000n
     const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"
 
@@ -44,13 +46,27 @@
         const signed = await ergo.sign_tx(tx);
         const txId = await ergo.submit_tx(signed);
         console.log(signed)
-        newBoxId = signed.outputs[0].boxId
+        newBox = signed.outputs[0]
+        newBoxText=JSON.stringify(newBox)
         console.log(txId)
         currentTx = txId
     }
+
+    function copyBoxName(){
+        navigator.clipboard.writeText(JSON.stringify(newBox))
+    }
+    async function pasteBoxName(){
+        newBoxText = await navigator.clipboard.readText()
+        newBox=JSON.parse(newBoxText)
+    }
+
+
 </script>
 <div>active contract:<a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{contract}</a></div>
 <div><button on:click={sendToken}>sendToken</button></div>
 <div><button on:click={receiveToken}>receiveToken</button></div>
 <div><a target="_blank" href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}>{"https://testnet.ergoplatform.com/en/transactions/"+currentTx}</a></div>
 <div>new box id = {newBoxId}</div>
+<textarea name="" id="111" cols="30" rows="10" bind:value={newBoxText}></textarea>
+<button on:click={copyBoxName}>copy</button>
+<button on:click={pasteBoxName}>paste</button>
