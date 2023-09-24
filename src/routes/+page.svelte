@@ -65,7 +65,7 @@
         currentTx = txId
     }
  
-    async function cancellTokenSell() {
+    async function cancelTokenSell() {
         await ergoConnector.nautilus.connect();
         const me = await ergo.get_change_address();
         const utxos = await ergo.get_utxos();
@@ -97,6 +97,7 @@
 <div>active contract:<a target="_blank" href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}>{contract}</a></div>
 <div><button on:click={sendToken}>sendToken</button></div>
 <div><button on:click={receiveToken}>receiveToken</button></div>
+<div><button on:click={cancelTokenSell}>cancelSellToken</button></div>
 <div><a target="_blank" href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}>{"https://testnet.ergoplatform.com/en/transactions/"+currentTx}</a></div>
 <div>new box id = {newBoxId}</div>
 <textarea name="" id="111" cols="30" rows="10" bind:value={newBoxText}></textarea>
