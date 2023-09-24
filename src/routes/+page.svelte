@@ -12,6 +12,7 @@
     let newBox = {a:"111"}
     let newBoxText=""
     const tokenId = "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
+    const additionalTokenId ="4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"
     const boxId = 'f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938'
     const price = 1_000_000_000n
     const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"

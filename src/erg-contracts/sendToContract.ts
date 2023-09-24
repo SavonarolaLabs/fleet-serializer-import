@@ -11,6 +11,9 @@ export function sellTx(contract: string, senderBase58PK: string, tokenId: string
     ).addTokens([{ 
         tokenId: tokenId, 
         amount: "1" 
+    }]).addTokens([{ 
+        tokenId: "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45", 
+        amount: "5" 
     }]).setAdditionalRegisters({
         R4: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex(),
         R5: SLong(1_000_000_000n).toHex(),

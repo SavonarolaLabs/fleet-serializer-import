@@ -24,10 +24,7 @@ export async function buyTx(buyBox:object, senderBase58PK: string, tokenId: stri
     const output = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         senderBase58PK
-    ).addTokens([{ 
-        tokenId: tokenId, 
-        amount: "1" 
-    }])
+    ).addTokens(buyBox.assets)
 
     const unsignedMintTransaction = new TransactionBuilder(height)
         .from([buyBox,...utxos ])
