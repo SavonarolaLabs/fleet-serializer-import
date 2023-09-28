@@ -4,6 +4,7 @@ import { SByte, SColl, SGroupElement, SInt, SLong, SSigmaProp } from "@fleet-sdk
 import { getBoxById } from "./box";
 import { stringToBytes } from "@scure/base";
 import { eip0004Regs, type eip004Regs } from "./eip004utils";
+import { getOracleBox } from "./getOracleBox";
 
 export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,ergoAmount:bigint,uiBase58PK:string): any{
     //add ,tokenId:string,tokenPrice:bigint
@@ -11,6 +12,7 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
     const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
     const targetHeight = 1100956n
     const targetPrice = 10n
+    const oracleBox=await getOracleBox()
 
     const tokenRegs: eip004Regs = {
         name: "$6000 Holdbox",
@@ -65,6 +67,8 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
         .build()
         .toEIP12Object();
 
+        unsignedMintTransaction.dataInputs=[oracleBox]
+        
     return unsignedMintTransaction
 
 }

@@ -12,15 +12,11 @@ export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utx
     const targetHeight = 1100956
     const targetPrice = 10n
 
-    const contract = new OutputBuilder(
-        ergoAmount,
-        contractBase58PK
-    ).setAdditionalRegisters({
-        R4: SLong(targetPrice).toHex(), //CHECK
-        R5: SInt(targetHeight).toHex(), //1100956
-        R6: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex(),
-        R7: SSigmaProp(SGroupElement(first(uiAddr.getPublicKeys()))).toHex(),
-    });
+    const output = new OutputBuilder(
+        SAFE_MIN_BOX_VALUE,
+        myAddr
+    ).addTokens(buyBox.assets)
+
 
     const devFee = new OutputBuilder(
         ergoAmount/200n,
@@ -33,8 +29,8 @@ export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utx
 
 
     const unsignedMintTransaction = new TransactionBuilder(height)
-        .from([...utxos])
-        .to([contract,nft])
+        .from([buyBox,...utxos])
+        .to([output,devFee,uiFee])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
@@ -42,38 +38,4 @@ export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utx
 
     return unsignedMintTransaction
 
-}
-
-export async function buyTx(buyBox:object, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number,tokenPrice:bigint,sellerBase58PK:string,dev:string): any{
-    //const buyBox = await getBoxById(buyBoxId);
-    const myAddr = ErgoAddress.fromBase58(senderBase58PK)
-
-    const seller = new OutputBuilder(
-        tokenPrice-tokenPrice/100n,
-        sellerBase58PK
-    )
-
-    const devFee = new OutputBuilder(
-        tokenPrice/100n,
-        dev
-    )
-    const uiFee = new OutputBuilder(
-        tokenPrice/100n,
-        dev
-    )
-
-    const output = new OutputBuilder(
-        SAFE_MIN_BOX_VALUE,
-        senderBase58PK
-    ).addTokens(buyBox.assets)
-
-    const unsignedMintTransaction = new TransactionBuilder(height)
-        .from([buyBox,...utxos ])
-        .to([seller,fee,output])
-        .sendChangeTo(myAddr)
-        .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
-        .build()
-        .toEIP12Object();
-
-    return unsignedMintTransaction
 }
