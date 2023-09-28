@@ -13,7 +13,7 @@ function boxToStrVal(box) {
 
   export async function getOracleBox() {
     const resp = await fetch(
-      `https://api-testnet.ergoplatform.com/api/v1/boxes/unspent/byTokenId/${mainnet_oracle}`
+      `https://api.ergoplatform.com/api/v1/boxes/unspent/byTokenId/${mainnet_oracle}`
     );
     let data = await resp.json();
     let oracleBox = data.items[0];
