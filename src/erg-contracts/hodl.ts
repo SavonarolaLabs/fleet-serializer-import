@@ -5,11 +5,10 @@ const a = `
     //val oraclePoolNFT = "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1"
     
     // Context vars set by the UI developer building the HODLBOX mint transaction
-    val optUIFeePK : SigmaProp       = getVar[SigmaProp](0)
-
     val hodlTargetRate : Long        = SELF.R4[Long].get
     val maxHeight : Int              = SELF.R5[Int].get
     val hodlerPK : SigmaProp         = SELF.R6[SigmaProp].get
+    val optUIFeePK : SigmaProp         = SELF.R7[SigmaProp].get
     
     val totalLockedNanoErg : Long    = SELF.value
     
