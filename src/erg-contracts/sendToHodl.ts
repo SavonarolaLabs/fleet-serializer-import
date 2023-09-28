@@ -9,7 +9,7 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
     //add ,tokenId:string,tokenPrice:bigint
     const myAddr = ErgoAddress.fromBase58(holderBase58PK)
     const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
-    const targetHeight = 1100956
+    const targetHeight = 1100956n
     const targetPrice = 10n
 
     const tokenRegs: eip004Regs = {
@@ -24,7 +24,7 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
         contractBase58PK
     ).setAdditionalRegisters({
         R4: SLong(targetPrice).toHex(), //CHECK
-        R5: SInt(targetHeight).toHex(), //1100956
+        R5: SLong(targetHeight).toHex(), //1100956
         R6: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex(),
         R7: SSigmaProp(SGroupElement(first(uiAddr.getPublicKeys()))).toHex(),
     });
