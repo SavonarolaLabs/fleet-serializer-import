@@ -5,6 +5,7 @@
   import { buyTx, getBox } from "../erg-contracts/buyFromContract";
   import { cancelTx } from "../erg-contracts/cancelSaleOrder";
   import { mintTokenTx } from "../erg-contracts/mint";
+  import { mintHodlBoxTx } from "../erg-contracts/sendToHodl";
 
   let contract: string = "";
   let currentTx = "";
@@ -20,6 +21,7 @@
   const price = 1_000_000_000n;
   const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3";
   const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib";
+  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc";
 
   onMount(doStuff);
 
@@ -118,6 +120,23 @@
     currentTx = txId;
   }
 
+  async function mintHodlBox() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    //const tokenName = "turbo ergo";
+    const amount = 3300000n;
+    const tx = await mintHodlBoxTx(me, utxos,height, contract, amount,ui);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    console.log(txId);
+    currentTx = txId;
+  }
+
+
   function copyBoxName() {
     navigator.clipboard.writeText(JSON.stringify(newBox));
   }
@@ -151,3 +170,5 @@
 <button on:click={copyBoxName}>copy</button>
 <button on:click={pasteBoxName}>paste</button>
 <div><button on:click={mintToken}>mint token</button></div>
+<div></div>
+<div><button on:click={mintHodlBox}>mint hodl box</button></div>
