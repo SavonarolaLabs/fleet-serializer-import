@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { compileSellContract } from "../erg-contracts/compile";
+  import { compileHodlContract, compileSellContract } from "../erg-contracts/compile";
   import { onMount } from "svelte";
   import { sellTx } from "../erg-contracts/sendToContract";
   import { buyTx, getBox } from "../erg-contracts/buyFromContract";
@@ -24,7 +24,8 @@
   onMount(doStuff);
 
   async function doStuff() {
-    contract = compileSellContract();
+    //contract = compileSellContract();
+    contract = compileHodlContract(dev);
     loadBox();
     //"https://testnet.ergoplatform.com/en/addresses/"+
     //sellTokens();

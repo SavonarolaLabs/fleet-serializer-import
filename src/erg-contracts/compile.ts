@@ -1,9 +1,21 @@
 import { compile } from "@fleet-sdk/compiler"
-import { Network } from "@fleet-sdk/core"
+import { ErgoAddress, Network, SColl, SGroupElement, SSigmaProp } from "@fleet-sdk/core"
 import { sell } from "./sell"
+import { hodl } from "./hodl"
+import { first } from "@fleet-sdk/common"
 
-export function compileSellContract(){
+export function compileSellContract() {
     const tree = compile(sell)
+    return tree.toAddress(Network.Testnet).toString()
+}
+
+export function compileHodlContract(devBase58PK: string): string {
+    const devAddr = ErgoAddress.fromBase58(devBase58PK)
+    const tree = compile(hodl, {
+        map: {
+            _contractDevPK: SSigmaProp(SGroupElement(first(devAddr.getPublicKeys()))).toHex()
+        }
+    });
     return tree.toAddress(Network.Testnet).toString()
 }
 
@@ -11,7 +23,7 @@ export function compileSellContract(){
 //    , {
 //    map: {
 //        $oraclePoolNFT: SColl(SByte, stringToBytes("utf8", devPK)),
-//        $contractDevPK: SSigmaProp({
+//        _contractDevPK: SSigmaProp({
 //            value: ErgoAddress.fromBase58(hodlerPK).getPublicKeys()[0],
 //            type: SigmaTypeCode.GroupElement
 //        })
