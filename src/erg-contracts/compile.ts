@@ -6,7 +6,7 @@ import { first } from "@fleet-sdk/common"
 
 export function compileSellContract() {
     const tree = compile(sell)
-    return tree.toAddress(Network.Testnet).toString()
+    return tree.toAddress(Network.Mainnet).toString()
 }
 
 export function compileHodlContract(devBase58PK: string): string {
@@ -17,7 +17,7 @@ export function compileHodlContract(devBase58PK: string): string {
             _oraclePoolNFT: SColl(SByte, "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1").toHex()
         }
     });
-    return tree.toAddress(Network.Testnet).toString()
+    return tree.toAddress(Network.Mainnet).toString()
 }
 
 //const tree = compile(saleContract
