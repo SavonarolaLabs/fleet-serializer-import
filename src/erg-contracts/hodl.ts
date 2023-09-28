@@ -8,24 +8,18 @@ const a = `
     val hodlTargetRate : Long        = SELF.R4[Long].get
     val maxHeight : Int              = SELF.R5[Int].get
     val hodlerPK : SigmaProp         = SELF.R6[SigmaProp].get
-    val optUIFeePK : SigmaProp         = SELF.R7[SigmaProp].get
+    val uiFeePK : SigmaProp       = SELF.R7[SigmaProp].get
     
     val totalLockedNanoErg : Long    = SELF.value
     
     val fees: Coll[(SigmaProp, BigInt)] = {
         val feeDenom : Long = 100000L
         val devFee  : Long  = 500L         // 0.5%
-        // If ui fee is defined, then we add an additional 0.5% fee
-        if(optUIFeePK.isDefined){
-            val uiFee : Long = 500L        // 0.5%
-
+        val uiFee : Long = 500L        // 0.5%
             Coll(
                  (_contractDevPK, (devFee.toBigInt * totalLockedNanoErg.toBigInt) / feeDenom.toBigInt),
-                 (optUIFeePK.get, (uiFee.toBigInt * totalLockedNanoErg.toBigInt) / feeDenom.toBigInt)
+                 (uiFeePK, (uiFee.toBigInt * totalLockedNanoErg.toBigInt) / feeDenom.toBigInt)
             )
-        }else{
-            Coll( (_contractDevPK, (devFee.toBigInt * totalLockedNanoErg.toBigInt) / feeDenom.toBigInt) )
-        }
     }
 
     // Ensure that correct fee output boxes exist
@@ -45,32 +39,22 @@ const a = `
         }
 
         val uiFeesPaid : Boolean = {
-            if(optUIFeePK.isDefined){
-                if(fees(1)._2 > 0){ // UI fee is greater than 0
-                    val uiOutput : Box    = OUTPUTS(2)
-                    allOf(
-                        Coll(
-                            uiOutput.propositionBytes   == fees(1)._1.propBytes,
-                            uiOutput.value.toBigInt     == fees(1)._2
-                        )
+            if(fees(1)._2 > 0){ // UI fee is greater than 0
+                val uiOutput : Box    = OUTPUTS(2)
+                allOf(
+                    Coll(
+                        uiOutput.propositionBytes   == fees(1)._1.propBytes,
+                        uiOutput.value.toBigInt     == fees(1)._2
                     )
-                }else{
-                    true // do nothing if ui fee doesn't end up greater than 0, prevents errors on low value bonds
-                }
+                )
             }else{
-                true // if ui fee isn't defined, then default to true.
+                true // do nothing if ui fee doesn't end up greater than 0, prevents errors on low value bonds
             }
         }
         devFeesPaid && uiFeesPaid
     }
 
-    val feesTotal : Long = {
-        if(optUIFeePK.isDefined){
-            fees(0)._2 + fees(1)._2
-        }else{
-            fees(0)._2
-        }
-    }
+    val feesTotal : Long = fees(0)._2 + fees(1)._2
 
     val repaymentNanoErg : Long = totalLockedNanoErg - feesTotal
 
