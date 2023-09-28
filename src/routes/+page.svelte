@@ -6,6 +6,7 @@
   import { cancelTx } from "../erg-contracts/cancelSaleOrder";
   import { mintTokenTx } from "../erg-contracts/mint";
   import { mintHodlBoxTx } from "../erg-contracts/sendToHodl";
+  import { receiveHodlBoxTx } from "../erg-contracts/receiveHodl";
 
   let contract: string = "";
   let currentTx = "";
@@ -13,15 +14,17 @@
   let newBox = { a: "111" };
   let newBoxText = "";
   const tokenId =
-    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";
+    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";// testnet
   const additionalTokenId =
-    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45";
+    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45";// testnet
   const boxId =
-    "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938";
+    "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938";// testnet
   const price = 1_000_000_000n;
-  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3";
-  const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib";
-  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc";
+  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3";// testnet
+  //const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib"; // testnet
+
+  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K";// mainnet
+  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc";// mainnet
 
   onMount(doStuff);
 
@@ -132,6 +135,30 @@
     const signed = await ergo.sign_tx(tx);
     const txId = await ergo.submit_tx(signed);
     console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
+    console.log(txId);
+    currentTx = txId;
+  }
+
+
+//receiveHodlBoxTx
+async function receiveHodlBox() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    //const tokenName = "turbo ergo";
+    const amount = 3300000n;
+    const tx = await receiveHodlBoxTx(newBox,me, utxos,height, contract, amount,ui,dev);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
     console.log(txId);
     currentTx = txId;
   }
@@ -161,8 +188,8 @@
 <div>
   <a
     target="_blank"
-    href={`https://testnet.ergoplatform.com/en/transactions/${currentTx}`}
-    >{"https://testnet.ergoplatform.com/en/transactions/" + currentTx}</a
+    href={`https://ergoplatform.com/en/transactions/${currentTx}`}
+    >{"https://ergoplatform.com/en/transactions/" + currentTx}</a
   >
 </div>
 <div>new box id = {newBoxId}</div>
@@ -172,3 +199,5 @@
 <div><button on:click={mintToken}>mint token</button></div>
 <div></div>
 <div><button on:click={mintHodlBox}>mint hodl box</button></div>
+<div></div>
+<div><button on:click={receiveHodlBox}>receive hodl box</button></div>
