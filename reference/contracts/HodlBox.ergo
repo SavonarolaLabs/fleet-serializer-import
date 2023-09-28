@@ -65,7 +65,7 @@
     }
 
     val feesTotal : Long = {
-        if(optUIFee.isDefined){
+        if(optUIFeePK.isDefined){
             fees(0)._2 + fees(1)._2
         }else{
             fees(0)._2
@@ -75,8 +75,8 @@
     val repaymentNanoErg : Long = totalLockedNanoErg - feesTotal
 
     val fundsReturned : Boolean = {
-        OUTPUTS(0).propositionBytes == hodlerPK.propBytes 
-        && OUTPUTS(0).value == repaymentNanoErg
+        OUTPUTS(0).propositionBytes == hodlerPK.propBytes && 
+        OUTPUTS(0).value == repaymentNanoErg
     }
 
     val maxHeightReached : Boolean = {
@@ -86,11 +86,11 @@
     val priceTargetReached : Boolean = {
         if (CONTEXT.dataInputs.size > 0) {
             // validate Oracle box
-            val rateBox : Box = CONTEXT.dataInputs(0)
-            val currentRate : Long = rateBox.R4[Long].get
+            val oracleBox : Box = CONTEXT.dataInputs(0)
+            val currentRate : Long = oracleBox.R4[Long].get
             val oracleHeight: Long = oracleBox.R5[Int].get
 
-            val validDataInput: Boolean = rateBox.tokens(0)._1 == oraclePoolNFT && HEIGHT <= oracleHeight + 30
+            val validDataInput: Boolean = (HEIGHT <= oracleHeight + 30) // && (oracleBox.tokens(0)._1 == oraclePoolNFT) 
 
             // check if the price reached target
             val targetPriceReached: Boolean = currentRate >= hodlTargetRate
