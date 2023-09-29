@@ -198,9 +198,12 @@
     >{contract}</a
   >
 </div>
-<div><button on:click={sellTokens}>sellTokens</button></div>
-<div><button on:click={receiveToken}>receiveToken</button></div>
-<div><button on:click={cancelTokenSell}>cancelSellToken</button></div>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={sellTokens}>sellTokens</button></div>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={receiveToken}>receiveToken</button></div>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={cancelTokenSell}>cancelSellToken</button></div>
 
 <div>
   <a
@@ -211,16 +214,22 @@
 </div>
 <div>new box id = {newBoxId}</div>
 <textarea name="" id="111" cols="30" rows="10" bind:value={newBoxText} />
-<button on:click={copyBoxName}>copy</button>
-<button on:click={pasteBoxName}>paste</button>
-<div><button on:click={mintToken}>mint token</button></div>
+<button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+ on:click={copyBoxName}>copy</button>
+<button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+ on:click={pasteBoxName}>paste</button>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={mintToken}>mint token</button></div>
 <div />
-<div><button on:click={mintHodlBox}>mint hodl box</button></div>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={mintHodlBox}>mint hodl box</button></div>
 <div />
-<div><button on:click={receiveHodlBox}>receive hodl box</button></div>
+<div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+   on:click={receiveHodlBox}>receive hodl box</button></div>
 
 <div class="mt-4">
-  <div><button on:click={refreshContractBoxes}>refresh boxes</button></div>
+  <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+     on:click={refreshContractBoxes}>refresh boxes</button></div>
   <div>{contract}</div>
   {#if contractBoxes.length < 1}
     <div>contract has no boxes</div>
