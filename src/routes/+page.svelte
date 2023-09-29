@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { compileHodlContract, compileSellContract } from "../erg-contracts/compile";
+  import {
+    compileHodlContract,
+    compileSellContract,
+  } from "../erg-contracts/compile";
   import { onMount } from "svelte";
   import { sellTx } from "../erg-contracts/sendToContract";
   import { buyTx, getBox } from "../erg-contracts/buyFromContract";
@@ -7,24 +10,26 @@
   import { mintTokenTx } from "../erg-contracts/mint";
   import { mintHodlBoxTx } from "../erg-contracts/sendToHodl";
   import { receiveHodlBoxTx } from "../erg-contracts/receiveHodl";
+  import { getContractBoxes } from "../erg-contracts/box";
 
   let contract: string = "";
+  let contractBoxes: any = [];
   let currentTx = "";
   let newBoxId = "";
   let newBox = { a: "111" };
   let newBoxText = "";
   const tokenId =
-    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119";// testnet
+    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
   const additionalTokenId =
-    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45";// testnet
+    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"; // testnet
   const boxId =
-    "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938";// testnet
+    "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938"; // testnet
   const price = 1_000_000_000n;
-  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3";// testnet
+  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"; // testnet
   //const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib"; // testnet
 
-  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K";// mainnet
-  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc";// mainnet
+  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
+  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc"; // mainnet
 
   onMount(doStuff);
 
@@ -32,6 +37,7 @@
     //contract = compileSellContract();
     contract = compileHodlContract(dev);
     loadBox();
+    refreshContractBoxes();
     //"https://testnet.ergoplatform.com/en/addresses/"+
     //sellTokens();
     //receiveToken();
@@ -130,7 +136,7 @@
     const height = await ergo.get_current_height();
     //const tokenName = "turbo ergo";
     const amount = 3300000n;
-    const tx = await mintHodlBoxTx(me, utxos,height, contract, amount,ui);
+    const tx = await mintHodlBoxTx(me, utxos, height, contract, amount, ui);
     console.log(tx);
     const signed = await ergo.sign_tx(tx);
     const txId = await ergo.submit_tx(signed);
@@ -142,16 +148,24 @@
     currentTx = txId;
   }
 
-
-//receiveHodlBoxTx
-async function receiveHodlBox() {
+  //receiveHodlBoxTx
+  async function receiveHodlBox() {
     await ergoConnector.nautilus.connect();
     const me = await ergo.get_change_address();
     const utxos = await ergo.get_utxos();
     const height = await ergo.get_current_height();
     //const tokenName = "turbo ergo";
     const amount = 3300000n;
-    const tx = await receiveHodlBoxTx(newBox,me, utxos,height, contract, amount,ui,dev);
+    const tx = await receiveHodlBoxTx(
+      newBox,
+      me,
+      utxos,
+      height,
+      contract,
+      amount,
+      ui,
+      dev
+    );
     console.log(tx);
     const signed = await ergo.sign_tx(tx);
     const txId = await ergo.submit_tx(signed);
@@ -162,7 +176,6 @@ async function receiveHodlBox() {
     console.log(txId);
     currentTx = txId;
   }
-
 
   function copyBoxName() {
     navigator.clipboard.writeText(JSON.stringify(newBox));
@@ -171,6 +184,10 @@ async function receiveHodlBox() {
     newBoxText = await navigator.clipboard.readText();
     newBox = JSON.parse(newBoxText);
     saveBox();
+  }
+
+  async function refreshContractBoxes() {
+    const boxes = await getContractBoxes(contract);
   }
 </script>
 
@@ -197,7 +214,32 @@ async function receiveHodlBox() {
 <button on:click={copyBoxName}>copy</button>
 <button on:click={pasteBoxName}>paste</button>
 <div><button on:click={mintToken}>mint token</button></div>
-<div></div>
+<div />
 <div><button on:click={mintHodlBox}>mint hodl box</button></div>
-<div></div>
+<div />
 <div><button on:click={receiveHodlBox}>receive hodl box</button></div>
+
+<div class="mt-4">
+  <div><button on:click={refreshContractBoxes}>refresh boxes</button></div>
+  <div>{contract}</div>
+  {#if contractBoxes.length < 1}
+    <div>contract has no boxes</div>
+  {:else}
+    <div class="flex flex-col gap-1">
+      {#each contractBoxes as box}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+          on:click={() => {
+            newBox = box;
+            newBoxText = JSON.stringify(newBox);
+          }}
+          class="cursor-pointer"
+        >
+          <div>boxId: {box}</div>
+          <div>{box.value} ERG</div>
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
