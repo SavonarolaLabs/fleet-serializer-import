@@ -14,11 +14,13 @@ export function compileHodlContract(devBase58PK: string): string {
     const tree = compile(hodl, {
         map: {
             _contractDevPK: SSigmaProp(SGroupElement(first(devAddr.getPublicKeys()))).toHex(),
-            _oraclePoolNFT: SColl(SByte, "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1").toHex()
+            _oraclePoolNFT: SColl(SByte, "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f").toHex()
         }
     });
     return tree.toAddress(Network.Mainnet).toString()
 }
+//011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f //new
+//0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1 // old 
 
 //const tree = compile(saleContract
 //    , {
