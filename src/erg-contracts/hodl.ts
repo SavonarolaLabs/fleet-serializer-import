@@ -30,7 +30,7 @@ const a = `
                 allOf(
                     Coll(
                         devOutput.propositionBytes   == fees(0)._1.propBytes,
-                        devOutput.value.toBigInt     == fees(0)._2
+                        devOutput.value.toBigInt     >= fees(0)._2
                     )
                 )
             }else{
@@ -44,7 +44,7 @@ const a = `
                 allOf(
                     Coll(
                         uiOutput.propositionBytes   == fees(1)._1.propBytes,
-                        uiOutput.value.toBigInt     == fees(1)._2
+                        uiOutput.value.toBigInt     >= fees(1)._2
                     )
                 )
             }else{
