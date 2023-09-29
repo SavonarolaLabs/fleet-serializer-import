@@ -245,7 +245,7 @@
           }}
           class="cursor-pointer"
         >
-          <div>boxId: {box}</div>
+          <div>boxId: {box.boxId}</div>
           <div>{box.value} ERG</div>
         </div>
       {/each}
