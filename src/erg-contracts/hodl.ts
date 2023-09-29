@@ -77,7 +77,7 @@ const a = `
             val validDataInput: Boolean = HEIGHT <= oracleHeight + 30 && oracleBox.tokens(0)._1 == _oraclePoolNFT
 
             // check if the price reached target
-            val targetPriceReached: Boolean = currentRate >= hodlTargetRate
+            val targetPriceReached: Boolean = currentRate <= hodlTargetRate
 
             validDataInput && targetPriceReached
         } else {
