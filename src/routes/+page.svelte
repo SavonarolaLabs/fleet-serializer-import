@@ -187,7 +187,7 @@
   }
 
   async function refreshContractBoxes() {
-    const boxes = await getContractBoxes(contract);
+    contractBoxes = await getContractBoxes(contract);
   }
 </script>
 
