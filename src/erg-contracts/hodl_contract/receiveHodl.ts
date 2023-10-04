@@ -1,10 +1,10 @@
 import { first } from "@fleet-sdk/common";
 import { ErgoAddress, ErgoUnsignedInput, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { SByte, SColl, SGroupElement, SInt, SLong, SSigmaProp } from "@fleet-sdk/serializer";
-import { getBoxById } from "./box";
+import { getBoxById } from "../box";
 import { stringToBytes } from "@scure/base";
-import { eip0004Regs, type eip004Regs } from "./eip004utils";
-import { getOracleBox } from "./getOracleBox";
+import { eip0004Regs, type eip004Regs } from "../eip004utils";
+import { getOracleBox } from "../getOracleBox";
 
 export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,ergoAmount:bigint,uiBase58PK:string, devBase58PK:string): any{
     //add ,tokenId:string,tokenPrice:bigint

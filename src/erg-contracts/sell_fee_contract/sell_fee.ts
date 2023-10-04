@@ -26,4 +26,4 @@ sigmaProp({
 }`*/
 // repaymentBox.R4[Coll[Byte]].get == SELF.id,
 
-export const sell = a;
+export const sellFee = a;

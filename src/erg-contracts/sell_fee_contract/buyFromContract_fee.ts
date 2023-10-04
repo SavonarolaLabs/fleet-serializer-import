@@ -1,7 +1,7 @@
 import { first } from "@fleet-sdk/common";
 import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { SByte, SColl, SGroupElement, SSigmaProp } from "@fleet-sdk/serializer";
-import { getBoxById } from "./box";
+import { getBoxById } from "../box";
 import { stringToBytes } from "@scure/base";
 
 export async function buyTx(buyBox:object, senderBase58PK: string, tokenId: string,utxos:Array<any>, height: number,tokenPrice:bigint,sellerBase58PK:string,dev:string): any{

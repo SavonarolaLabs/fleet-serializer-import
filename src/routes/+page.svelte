@@ -4,12 +4,17 @@
     compileSellContract,
   } from "../erg-contracts/compile";
   import { onMount } from "svelte";
-  import { sellTx } from "../erg-contracts/sendToContract";
-  import { buyTx, getBox } from "../erg-contracts/buyFromContract";
+  
+  import { sellForErgTx } from "../erg-contracts/sell_contract/sendToContract";
+  import { buyForErgTx, getBox } from "../erg-contracts/sell_contract/buyFromContract";
+
+  import { sellTx } from "../erg-contracts/sell_fee_contract/sendToContract_fee";
+  import { buyTx } from "../erg-contracts/sell_fee_contract/buyFromContract_fee";
+  
   import { cancelTx } from "../erg-contracts/cancelSaleOrder";
   import { mintTokenTx } from "../erg-contracts/mint";
-  import { mintHodlBoxTx } from "../erg-contracts/sendToHodl";
-  import { receiveHodlBoxTx } from "../erg-contracts/receiveHodl";
+  import { mintHodlBoxTx } from "../erg-contracts/hodl_contract/sendToHodl";
+  import { receiveHodlBoxTx } from "../erg-contracts/hodl_contract/receiveHodl";
   import { getContractBoxes } from "../erg-contracts/box";
 
   let contract: string = "";
@@ -19,7 +24,8 @@
   let newBox = { a: "111" };
   let newBoxText = "";
   const tokenId =
-    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
+    "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
+    //"89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
   const additionalTokenId =
     "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"; // testnet
   const boxId =
@@ -34,8 +40,8 @@
   onMount(doStuff);
 
   async function doStuff() {
-    //contract = compileSellContract();
-    contract = compileHodlContract(dev);
+    contract = compileSellContract();
+    //contract = compileHodlContract(dev);
     loadBox();
     refreshContractBoxes();
     //"https://testnet.ergoplatform.com/en/addresses/"+
@@ -82,7 +88,6 @@
     const height = await ergo.get_current_height();
     const assets = [
       { tokenId: tokenId, amount: "1" },
-      { tokenId: additionalTokenId, amount: "7" },
     ];
     const tx = sellTx(contract, me, tokenId, utxos, height, dev, assets);
     console.log(tx);
