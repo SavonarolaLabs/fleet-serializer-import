@@ -3,14 +3,14 @@ const a = `
 
 SELF.R4[SigmaProp].get || 
 sigmaProp({       
-    val sellerPK                      = SELF.R4[SigmaProp].get.propBytes
-    val amount                        = SELF.R5[Long].get
-    val tokenId                       = SELF.R6[Coll[Byte]].get
+    val sellerPK                       = SELF.R4[SigmaProp].get.propBytes
+    val amount                         = SELF.R5[Long].get
+    
     
     val isPaid = {
-        if(tokenId.size>0)
-        {
-            OUTPUTS(0).tokens(0)._1   == tokenId &&
+        if(SELF.R6[Coll[Byte]].isDefined)
+        {   
+            OUTPUTS(0).tokens(0)._1   == SELF.R6[Coll[Byte]].get &&
             OUTPUTS(0).tokens(0)._2   == amount 
         }
         else

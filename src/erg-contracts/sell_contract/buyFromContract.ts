@@ -5,7 +5,7 @@ import { getBoxById } from "../box";
 import { stringToBytes } from "@scure/base";
 
 export async function buyForErgTx(buyBox:object, senderBase58PK: string,utxos:Array<any>, height: number,price:bigint,sellerBase58PK:string): any{
-    //const buyBox = await getBoxById(buyBoxId);
+
     const myAddr = ErgoAddress.fromBase58(senderBase58PK)
 
     const seller = new OutputBuilder(
@@ -16,15 +16,10 @@ export async function buyForErgTx(buyBox:object, senderBase58PK: string,utxos:Ar
         R4: SColl(SByte, buyBox.boxId).toHex(),
     });
 
-
-    const output = new OutputBuilder(
-        SAFE_MIN_BOX_VALUE,
-        senderBase58PK
-    ).addTokens(buyBox.assets)
-
+    
     const unsignedMintTransaction = new TransactionBuilder(height)
         .from([buyBox,...utxos ])
-        .to([seller,output])
+        .to([seller])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
