@@ -4,7 +4,7 @@
     compileSellContract,
   } from "../erg-contracts/compile";
   import { onMount } from "svelte";
-  
+
   import { sellForErgTx } from "../erg-contracts/sell_contract/sendToContract";
   import { buyForErgTx, getBox } from "../erg-contracts/sell_contract/buyFromContract";
 
@@ -23,24 +23,19 @@
   let newBoxId = "";
   let newBox = { a: "111" };
   let newBoxText = "";
-  const tokenId =
-    "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
-    //"89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
-  const additionalTokenId =
-    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"; // testnet
-  const boxId =
-    "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938"; // testnet
+  let address = ""
+  const tokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
+  const additionalTokenId =""
   const price = 1_000_000_000n;
-  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"; // testnet
-  //const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib"; // testnet
-
-  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
-  const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc"; // mainnet
+  const seller = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
+  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K";    // mainnet
+  const ui = "9fKtqapsSby7JFJKTvx6j4xSUT1nEFEzTrQyqZ1r6fXUrTYa7VK";     // mainnet
 
   onMount(doStuff);
 
   async function doStuff() {
     contract = compileSellContract();
+    refreshWallet();
     //contract = compileHodlContract(dev);
     loadBox();
     refreshContractBoxes();
@@ -48,6 +43,12 @@
     //sellTokens();
     //receiveToken();
   }
+  async function refreshWallet(){
+    if(window.ergoConnector["nautilus"]?.isConnected){
+        address= await ergo.get_change_address();
+    }
+  }
+
   function loadBox() {
     const x = localStorage.getItem("contract_box");
     if (x) {
@@ -59,7 +60,7 @@
     localStorage.setItem("contract_box", newBoxText);
   }
 
-  async function receiveToken() {
+  async function receiveTokenWithFee() {
     await ergoConnector.nautilus.connect();
     const me = await ergo.get_change_address();
     const utxos = await ergo.get_utxos();
@@ -81,7 +82,8 @@
     console.log(txId);
     currentTx = txId;
   }
-  async function sellTokens() {
+
+  async function sellTokensWithFee() {
     await ergoConnector.nautilus.connect();
     const me = await ergo.get_change_address();
     const utxos = await ergo.get_utxos();
@@ -100,6 +102,47 @@
     console.log(txId);
     currentTx = txId;
   }
+
+  async function sellTokens() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    const assets = [
+      { tokenId: tokenId, amount: "1" },
+    ];
+    const tx = sellForErgTx(contract, me, utxos, height, assets, price);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
+    console.log(txId);
+    currentTx = txId;
+  }
+  async function receiveToken() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    const tx = await buyForErgTx(
+      newBox,
+      me,
+      utxos,
+      height,
+      price,
+      seller,
+    );
+    //const tx = await getBox(boxId, me, tokenId, utxos, height);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(txId);
+    currentTx = txId;
+  }
+
 
   async function cancelTokenSell() {
     await ergoConnector.nautilus.connect();
@@ -197,6 +240,9 @@
 </script>
 
 <div>
+    active wallet: {address}
+  </div>
+<div>
   active contract:<a
     target="_blank"
     href={`https://testnet.ergoplatform.com/en/addresses/${contract}`}
@@ -204,9 +250,15 @@
   >
 </div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-   on:click={sellTokens}>sellTokens</button></div>
+   on:click={sellTokensWithFee}>sell Tokens With Fee</button>
+   <button class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
+   on:click={sellTokens}>sell Tokens - No Fee</button>
+</div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-   on:click={receiveToken}>receiveToken</button></div>
+   on:click={receiveTokenWithFee}>receive Token With Fee </button>
+   <button class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
+   on:click={receiveToken}>receive Token - No Fee</button>
+</div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={cancelTokenSell}>cancelSellToken</button></div>
 
