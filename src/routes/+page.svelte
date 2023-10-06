@@ -5,8 +5,8 @@
   } from "../erg-contracts/compile";
   import { onMount } from "svelte";
 
-  import { sellForErgTx } from "../erg-contracts/sell_contract/sendToContract";
-  import { buyForErgTx, getBox } from "../erg-contracts/sell_contract/buyFromContract";
+  import { sellForErgTx, sellForTokenTx } from "../erg-contracts/sell_contract/sendToContract";
+  import { buyForErgTx, buyForTokenTx, getBox } from "../erg-contracts/sell_contract/buyFromContract";
 
   import { sellTx } from "../erg-contracts/sell_fee_contract/sendToContract_fee";
   import { buyTx } from "../erg-contracts/sell_fee_contract/buyFromContract_fee";
@@ -24,9 +24,15 @@
   let newBox = { a: "111" };
   let newBoxText = "";
   let address = ""
-  const tokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
+
   const additionalTokenId =""
   const price = 1_000_000_000n;
+  const tokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
+
+  const currencyAmount = 7n;
+  const currencyTokenId = "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; // mainnet turbo-ergo token
+
+
   const seller = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
   const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K";    // mainnet
   const ui = "9fKtqapsSby7JFJKTvx6j4xSUT1nEFEzTrQyqZ1r6fXUrTYa7VK";     // mainnet
@@ -103,7 +109,7 @@
     currentTx = txId;
   }
 
-  async function sellTokens() {
+  async function sellTokensForErg() {
     await ergoConnector.nautilus.connect();
     const me = await ergo.get_change_address();
     const utxos = await ergo.get_utxos();
@@ -122,7 +128,7 @@
     console.log(txId);
     currentTx = txId;
   }
-  async function receiveToken() {
+  async function receiveTokenForErg() {
     await ergoConnector.nautilus.connect();
     const me = await ergo.get_change_address();
     const utxos = await ergo.get_utxos();
@@ -143,6 +149,46 @@
     currentTx = txId;
   }
 
+  async function sellTokensForToken() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    const assets = [
+      { tokenId: tokenId, amount: "1" },
+    ];
+    const tx = sellForTokenTx(contract, me, utxos, height, assets, currencyAmount,currencyTokenId);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
+    console.log(txId);
+    currentTx = txId;
+  }
+  async function receiveTokenForToken() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    const tx = await buyForTokenTx(
+      newBox,
+      me,
+      utxos,
+      height,
+      currencyAmount,
+      seller,
+      currencyTokenId
+    );
+    //const tx = await getBox(boxId, me, tokenId, utxos, height);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(txId);
+    currentTx = txId;
+  }
 
   async function cancelTokenSell() {
     await ergoConnector.nautilus.connect();
@@ -252,12 +298,16 @@
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={sellTokensWithFee}>sell Tokens With Fee</button>
    <button class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
-   on:click={sellTokens}>sell Tokens - No Fee</button>
+   on:click={sellTokensForErg}>sell Tokens for ERG - No Fee</button>
+   <button class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"
+   on:click={sellTokensForToken}>sell Tokens for Token - No Fee</button>
 </div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={receiveTokenWithFee}>receive Token With Fee </button>
    <button class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
-   on:click={receiveToken}>receive Token - No Fee</button>
+   on:click={receiveTokenForErg}>receive Token for ERG- No Fee</button>
+   <button class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"
+   on:click={receiveTokenForToken}>receive Token for Token- No Fee</button>
 </div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={cancelTokenSell}>cancelSellToken</button></div>
