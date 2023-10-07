@@ -40,9 +40,9 @@
   onMount(doStuff);
 
   async function doStuff() {
-    contract = compileSellContract();
+    //contract = compileSellContract();
     refreshWallet();
-    //contract = compileHodlContract(dev);
+    contract = compileHodlContract(dev);
     loadBox();
     refreshContractBoxes();
     //"https://testnet.ergoplatform.com/en/addresses/"+
