@@ -4,8 +4,8 @@
     compileSellContract,
   } from "../erg-contracts/compile";
   import { onMount } from "svelte";
-  import { sellTx } from "../erg-contracts/sendToContract";
-  import { buyTx, getBox } from "../erg-contracts/buyFromContract";
+  import { sellTx } from "../erg-contracts/sellTx";
+  import { buyTx} from "../erg-contracts/buyTx";
   import { cancelTx } from "../erg-contracts/cancelSaleOrder";
   import { mintTokenTx } from "../erg-contracts/mint";
   import { mintHodlBoxTx } from "../erg-contracts/sendToHodl";
@@ -19,23 +19,26 @@
   let newBox = { a: "111" };
   let newBoxText = "";
   const tokenId =
-    "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
+   // "89963543c7fa6064cf8e5f567740ff060d4a2b94188d1f267db7ae425a574119"; // testnet
+    "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; //mainnet lambo token 
   const additionalTokenId =
-    "4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"; // testnet
+    //"4e4c4d02fcde7cd41003ef296721482f04d4773578cdedfda86442f0263b2f45"; // testnet
+    "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; //mainnet turbo ergo token
   const boxId =
     "f82d464105672de7ffc90bd142fd1541a76abbc19651e14dcc5e7300fa969938"; // testnet
   const price = 1_000_000_000n;
-  const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"; // testnet
+  const seller = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet 
+  // const seller = "3Wxa3TmDCRttbDSFxxobU68r9SAPyHcsLwKVwwjGnUDC7yVyYaj3"; // testnet
   //const dev = "3Wz5dU7b5PR7cZmbAvwg6kgYnrfsQTEi3rp2NHr9CRRBfCyWHEib"; // testnet
 
-  const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
+  const dev = "9ffXZz5AovJvapPo63TGwdNaRPMUiHo2UkqGavmDGzrUERY9qJ3"; // mainnet
   const ui = "9hmbPzLaatijdTkLoTo8HLLChjj21uAaPZ7H9YBMT4X8SM2kcZc"; // mainnet
 
   onMount(doStuff);
 
   async function doStuff() {
-    //contract = compileSellContract();
-    contract = compileHodlContract(dev);
+    contract = compileSellContract();
+    //contract = compileHodlContract(dev);
     loadBox();
     refreshContractBoxes();
     //"https://testnet.ergoplatform.com/en/addresses/"+
@@ -61,7 +64,6 @@
     const tx = await buyTx(
       newBox,
       me,
-      tokenId,
       utxos,
       height,
       price,
@@ -82,9 +84,9 @@
     const height = await ergo.get_current_height();
     const assets = [
       { tokenId: tokenId, amount: "1" },
-      { tokenId: additionalTokenId, amount: "7" },
+      { tokenId: additionalTokenId, amount: "2" },
     ];
-    const tx = sellTx(contract, me, tokenId, utxos, height, dev, assets);
+    const tx = sellTx(contract, me, utxos, height, dev, assets, price);
     console.log(tx);
     const signed = await ergo.sign_tx(tx);
     const txId = await ergo.submit_tx(signed);

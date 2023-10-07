@@ -1,11 +1,11 @@
 import { compile } from "@fleet-sdk/compiler"
 import { ErgoAddress, Network, SByte, SColl, SGroupElement, SSigmaProp } from "@fleet-sdk/core"
-import { sell } from "./sell"
+import { saleContract } from "./saleContract"
 import { hodl } from "./hodl"
 import { first } from "@fleet-sdk/common"
 
 export function compileSellContract() {
-    const tree = compile(sell)
+    const tree = compile(saleContract)
     return tree.toAddress(Network.Mainnet).toString()
 }
 
