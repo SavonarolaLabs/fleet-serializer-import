@@ -6,54 +6,56 @@ import { stringToBytes } from "@scure/base";
 import { eip0004Regs, type eip004Regs } from "../eip004utils";
 import { getOracleBox } from "../getOracleBox";
 
-export async function receiveHodlErg3BoxTx(buyBox:object, holderBase58PK: string,utxos:Array<any>, height: number,uiBase58PK:string, devBase58PK:string): any{
-    //add ,tokenId:string,tokenPrice:bigint
+export async function receiveHodlErg3BoxTx(buyBox: object, holderBase58PK: string, utxos: Array<any>, height: number, uiBase58PK: string, devBase58PK: string): any {
+
     const myAddr = ErgoAddress.fromBase58(holderBase58PK)
-    const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
-    const targetHeight = 1100956
-    const targetPrice = 10n
-    const oracleBox=await getOracleBox()
 
-    const assets = buyBox.assets
-    const devFeeAsset = {tokenId:assets[0].tokenId,amount:assets[0].amount/200n}
-    const uiFeeAsset = {tokenId:assets[0].tokenId,amount:assets[0].amount/200n}
-    const hodlerAsset = {tokenId:assets[0].tokenId,amount:assets[0].amount-assets[0].amount/100n}
-    assets[0]=hodlerAsset
+    const oracleBox = await getOracleBox()
 
-    const hodler = new OutputBuilder(
+    const assets = JSON.parse(JSON.stringify(buyBox.assets))
+    let devAssetAmount = BigInt(assets[0].amount) / 200n
+    let uiAssetAmount = BigInt(assets[0].amount) / 200n
+    let userAmount = BigInt(assets[0].amount) - devAssetAmount - uiAssetAmount
+
+    const devFeeAsset = { tokenId: assets[0].tokenId, amount: devAssetAmount.toString() }
+    const uiFeeAsset = { tokenId: assets[0].tokenId, amount: uiAssetAmount.toString() }
+    const hodlerAsset = { tokenId: assets[0].tokenId, amount: userAmount.toString() }
+    assets[0] = hodlerAsset
+
+    const hodlerBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         myAddr
     )
-    .addTokens(assets) 
-    .setAdditionalRegisters({
-        R4: SColl(SByte, buyBox.boxId).toHex(),
-    });
-    
-    const devFee = new OutputBuilder(
+        .addTokens(assets)
+        .setAdditionalRegisters({
+            R4: SColl(SByte, buyBox.boxId).toHex(),
+        });
+
+    const devFeeBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         devBase58PK
     )
-    .addTokens(devFeeAsset) 
-    
-    const uiFee = new OutputBuilder(
+        .addTokens([devFeeAsset])
+
+    const uiFeeBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         uiBase58PK
     )
-    .addTokens(uiFeeAsset) 
+        .addTokens([uiFeeAsset])
 
+    const receiversBoxes = [hodlerBox, devAssetAmount > 0n ? devFeeBox : undefined, uiAssetAmount > 0n ? uiFeeBox : undefined].filter(x => x)
 
     const unsignedMintTransaction = new TransactionBuilder(height)
         .configureSelector((selector) => selector.ensureInclusion(buyBox.boxId))
-        .from([buyBox,...utxos])
-        .to([hodler,devFee,uiFee])
+        .from([buyBox, ...utxos])
+        .to(receiversBoxes)
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE)
         .build()
         .toEIP12Object();
 
 
-        unsignedMintTransaction.dataInputs=[oracleBox]
-        
+    unsignedMintTransaction.dataInputs = [oracleBox]
 
     return unsignedMintTransaction
 
