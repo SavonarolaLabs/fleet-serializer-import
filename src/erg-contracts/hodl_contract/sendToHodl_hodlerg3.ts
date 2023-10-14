@@ -6,7 +6,7 @@ import { stringToBytes } from "@scure/base";
 import { eip0004Regs, type eip004Regs } from "../eip004utils";
 import { getOracleBox } from "../getOracleBox";
 
-export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,assets:any,uiBase58PK:string): any{
+export async function mintHodlErg3BoxTx(holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,assets:any,uiBase58PK:string): any{
     //add ,tokenId:string,tokenPrice:bigint
     const myAddr = ErgoAddress.fromBase58(holderBase58PK)
     const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
