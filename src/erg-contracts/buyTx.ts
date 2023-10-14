@@ -21,17 +21,12 @@ export async function buyTx(buyBox:any, senderBase58PK: string, utxos:Array<any>
         devBase58PK
     )
 
-    const buyer = new OutputBuilder(
-        SAFE_MIN_BOX_VALUE,
-        myAddr
-    ).addTokens(boxOnContract.assets.map(a=>{
-        a.amount=+a.amount+(+utxos.flatMap(u=>u.assets.filter(aa=>aa.tokenId==a.tokenId)).map(a=>a.amount).reduce((s,am)=>+am+s,0))
-        return a
-    }))
+
 
     const unsignedMintTransaction = new TransactionBuilder(height)
+        .configureSelector((selector) => selector.ensureInclusion(buyBox.boxId))
         .from([buyBox,...utxos ])
-        .to([seller,fee,buyer])
+        .to([seller,fee])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
