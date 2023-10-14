@@ -83,8 +83,7 @@
     const utxos = await ergo.get_utxos();
     const height = await ergo.get_current_height();
     const assets = [
-      { tokenId: tokenId, amount: "1" },
-      { tokenId: additionalTokenId, amount: "2" },
+      { tokenId: tokenId, amount: "3" },
     ];
     const tx = sellTx(contract, me, utxos, height, dev, assets, price);
     console.log(tx);
