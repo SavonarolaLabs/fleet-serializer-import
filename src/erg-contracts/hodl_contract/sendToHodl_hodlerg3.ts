@@ -16,7 +16,6 @@ export async function mintHodlErg3BoxTx(holderBase58PK: string,utxos:Array<any>,
     // 1502000000n // High
     // 998003992n
     // 600000000n // Low 
-    const oracleBox=await getOracleBox()
 
     const tokenRegs: eip004Regs = {
         name: "$6000 Holdbox",
@@ -25,7 +24,7 @@ export async function mintHodlErg3BoxTx(holderBase58PK: string,utxos:Array<any>,
         url: "here IPFS LINK to image",
     };
 
-    const contract = new OutputBuilder(
+    const contractBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         contractBase58PK
     )
@@ -37,7 +36,7 @@ export async function mintHodlErg3BoxTx(holderBase58PK: string,utxos:Array<any>,
         R7: SSigmaProp(SGroupElement(first(uiAddr.getPublicKeys()))).toHex(),
     });
 
-    const nft = new OutputBuilder(
+    const nftBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         holderBase58PK
     ).mintToken({
@@ -48,7 +47,7 @@ export async function mintHodlErg3BoxTx(holderBase58PK: string,utxos:Array<any>,
 
     const unsignedMintTransaction = new TransactionBuilder(height)
         .from([...utxos])
-        .to([contract,nft])
+        .to([contractBox,nftBox])
         .sendChangeTo(myAddr)
         .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
         .build()
