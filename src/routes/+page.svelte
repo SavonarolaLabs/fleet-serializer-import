@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     compileHodlContract,
+    compileHodlErg3Contract,
     compileSellContract,
   } from "../erg-contracts/compile";
   import { onMount } from "svelte";
@@ -16,6 +17,10 @@
   import { mintHodlBoxTx } from "../erg-contracts/hodl_contract/sendToHodl";
   import { receiveHodlBoxTx } from "../erg-contracts/hodl_contract/receiveHodl";
   import { getContractBoxes } from "../erg-contracts/box";
+  import { mintHodlErg3BoxTx } from "../erg-contracts/hodl_contract/sendToHodl_hodlerg3";
+  import { receiveHodlErg3BoxTx } from "../erg-contracts/hodl_contract/receiveHodl_hodlerg3";
+
+
 
   let contract: string = "";
   let contractBoxes: any = [];
@@ -25,11 +30,10 @@
   let newBoxText = "";
   let address = ""
 
-  const additionalTokenId =""
   const price = 1_000_000_000n;
-  const tokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
-
-  const currencyAmount = 7n;
+  const tokenId = "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; // mainnet Turbo-Ergo token
+  const tokenAmount = "1"; // mainnet Turbo-Ergo token
+  const additionalTokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
   const currencyTokenId = "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; // mainnet turbo-ergo token
 
 
@@ -42,7 +46,8 @@
   async function doStuff() {
     //contract = compileSellContract();
     refreshWallet();
-    contract = compileHodlContract(dev);
+    //contract = compileHodlContract(dev);    // Hodl for Erg
+    contract = compileHodlErg3Contract(dev);  // Hodl for HodlErg3
     loadBox();
     refreshContractBoxes();
     //"https://testnet.ergoplatform.com/en/addresses/"+
@@ -271,6 +276,55 @@
     currentTx = txId;
   }
 
+
+  async function mintHodlErg3Box() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+
+    const assets = [
+      { tokenId: tokenId, amount: tokenAmount },
+    ];
+    
+    const tx = await mintHodlErg3BoxTx(me, utxos, height, contract, assets, ui);
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
+    console.log(txId);
+    currentTx = txId;
+  }
+
+  async function receiveHodlErg3Box() {
+    await ergoConnector.nautilus.connect();
+    const me = await ergo.get_change_address();
+    const utxos = await ergo.get_utxos();
+    const height = await ergo.get_current_height();
+    const tx = await receiveHodlErg3BoxTx(
+      newBox,
+      me,
+      utxos,
+      height,
+      ui,
+      dev
+    );
+    console.log(tx);
+    const signed = await ergo.sign_tx(tx);
+    const txId = await ergo.submit_tx(signed);
+    console.log(signed);
+    newBox = signed.outputs[0];
+    newBoxText = JSON.stringify(newBox);
+    saveBox();
+    console.log(txId);
+    currentTx = txId;
+  }
+
+
+
   function copyBoxName() {
     navigator.clipboard.writeText(JSON.stringify(newBox));
   }
@@ -295,12 +349,19 @@
     >{contract}</a
   >
 </div>
+<div>
+  <button class="text-white bg-black hover:bg-black focus:ring-4 focus:ring-black font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-black dark:hover:bg-black focus:outline-none dark:focus:ring-black"
+  on:click={mintHodlErg3Box}>Mint HodlBox HodlErg3</button>
+  <button class="text-white bg-black hover:bg-black focus:ring-4 focus:ring-black font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-black dark:hover:bg-black focus:outline-none dark:focus:ring-black"
+  on:click={receiveHodlErg3Box}>Receive HodlBox HodlErg3</button>
+</div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={sellTokensWithFee}>sell Tokens With Fee</button>
    <button class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 focus:outline-none dark:focus:ring-green-800"
    on:click={sellTokensForErg}>sell Tokens for ERG - No Fee</button>
    <button class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"
    on:click={sellTokensForToken}>sell Tokens for Token - No Fee</button>
+
 </div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={receiveTokenWithFee}>receive Token With Fee </button>
@@ -308,6 +369,8 @@
    on:click={receiveTokenForErg}>receive Token for ERG- No Fee</button>
    <button class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 focus:outline-none dark:focus:ring-red-800"
    on:click={receiveTokenForToken}>receive Token for Token- No Fee</button>
+
+
 </div>
 <div><button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
    on:click={cancelTokenSell}>cancelSellToken</button></div>
