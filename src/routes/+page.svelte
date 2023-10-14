@@ -254,14 +254,12 @@
     const utxos = await ergo.get_utxos();
     const height = await ergo.get_current_height();
     //const tokenName = "turbo ergo";
-    const amount = 3300000n;
+    //const amount = 3300000n;
     const tx = await receiveHodlBoxTx(
       newBox,
       me,
       utxos,
       height,
-      contract,
-      amount,
       ui,
       dev
     );

@@ -1,23 +1,18 @@
 import { first } from "@fleet-sdk/common";
 import { ErgoAddress, ErgoUnsignedInput, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { SByte, SColl, SGroupElement, SInt, SLong, SSigmaProp } from "@fleet-sdk/serializer";
-import { getBoxById } from "../box";
-import { stringToBytes } from "@scure/base";
 import { eip0004Regs, type eip004Regs } from "../eip004utils";
-import { getOracleBox } from "../getOracleBox";
 
 export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,ergoAmount:bigint,uiBase58PK:string): any{
-    //add ,tokenId:string,tokenPrice:bigint
     const myAddr = ErgoAddress.fromBase58(holderBase58PK)
     const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
     const targetHeight = 1101525
-    //const usdErgPrice =Math.trunc(1/998003992*10**18)
+
     const targetPrice = 600000000n
     const targetRate = 10n**18n/targetPrice
     //1502000000n // High
     // 998003992n
     // 600000000n // Low 
-    const oracleBox=await getOracleBox()
 
     const tokenRegs: eip004Regs = {
         name: "$6000 Holdbox",
@@ -26,7 +21,7 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
         url: "here IPFS LINK to image",
     };
 
-    const contract = new OutputBuilder(
+    const contractBox = new OutputBuilder(
         ergoAmount,
         contractBase58PK
     ).setAdditionalRegisters({
@@ -36,23 +31,7 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
         R7: SSigmaProp(SGroupElement(first(uiAddr.getPublicKeys()))).toHex(),
     });
 
-    //---------------------Context to particular box--------------------------- 
-    // const inputWithContext = new ErgoUnsignedInput(fee.box).setContextVars({  
-    //      0: SSigmaProp(SGroupElement(first(myAddr.getPublicKeys()))).toHex()
-    //    });
-    //-------------------------------------------------------------------------
-    // inputWithContext.setContextVars({ 0: "0402", 1: "0580c0fc82aa02" });
-
-    // if inside Tx 
-    // addInputs(
-    //     new ErgoUnsignedInput(orderBox).setContextVars({
-    //         0: SSigmaProp(SGroupElement(first(params.uiImplementor.getPublicKeys()))).toHex()
-    //     })
-    // );
-
-
-
-    const nft = new OutputBuilder(
+    const nftBox = new OutputBuilder(
         SAFE_MIN_BOX_VALUE,
         holderBase58PK
     ).mintToken({
@@ -63,13 +42,11 @@ export async function mintHodlBoxTx(holderBase58PK: string,utxos:Array<any>, hei
 
     const unsignedMintTransaction = new TransactionBuilder(height)
         .from([...utxos])
-        .to([contract,nft])
+        .to([contractBox,nftBox])
         .sendChangeTo(myAddr)
-        .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
+        .payFee(RECOMMENDED_MIN_FEE_VALUE)
         .build()
         .toEIP12Object();
-
-        //unsignedMintTransaction.dataInputs=[oracleBox]
         
     return unsignedMintTransaction
 

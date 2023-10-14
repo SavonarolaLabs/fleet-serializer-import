@@ -1,48 +1,44 @@
-import { first } from "@fleet-sdk/common";
-import { ErgoAddress, ErgoUnsignedInput, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
-import { SByte, SColl, SGroupElement, SInt, SLong, SSigmaProp } from "@fleet-sdk/serializer";
-import { getBoxById } from "../box";
-import { stringToBytes } from "@scure/base";
-import { eip0004Regs, type eip004Regs } from "../eip004utils";
+import { ErgoAddress, OutputBuilder, RECOMMENDED_MIN_FEE_VALUE, SAFE_MIN_BOX_VALUE, TransactionBuilder } from "@fleet-sdk/core";
 import { getOracleBox } from "../getOracleBox";
 
-export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utxos:Array<any>, height: number,contractBase58PK:string,ergoAmount:bigint,uiBase58PK:string, devBase58PK:string): any{
-    //add ,tokenId:string,tokenPrice:bigint
+export async function receiveHodlBoxTx(buyBox:object, holderBase58PK: string,utxos:Array<any>, height: number,uiBase58PK:string, devBase58PK:string): any{
+
     const myAddr = ErgoAddress.fromBase58(holderBase58PK)
-    const uiAddr = ErgoAddress.fromBase58(uiBase58PK) 
-    const targetHeight = 1100956
-    const targetPrice = 10n
+
     const oracleBox=await getOracleBox()
 
-    const output = new OutputBuilder(
-        BigInt(buyBox.value)-ergoAmount/100n,
+    const value = BigInt(buyBox.value)
+
+    let devFeeAmount = value / 200n
+    let uiFeeAmount = value / 200n
+    let userAmount = value - devFeeAmount - uiFeeAmount
+
+    const hodlerBox = new OutputBuilder(
+        userAmount,
         myAddr
     ).addTokens(buyBox.assets)
-    
-    //27720/0.05 = 5 544 000
 
-    const devFee = new OutputBuilder(
-        SAFE_MIN_BOX_VALUE>ergoAmount/200n?SAFE_MIN_BOX_VALUE:ergoAmount/200n,
+    const devFeeBox = new OutputBuilder(
+        SAFE_MIN_BOX_VALUE>devFeeAmount?SAFE_MIN_BOX_VALUE:devFeeAmount,
         devBase58PK
     )
-    const uiFee = new OutputBuilder(
-        SAFE_MIN_BOX_VALUE>ergoAmount/200n?SAFE_MIN_BOX_VALUE:ergoAmount/200n,
+    const uiFeeBox = new OutputBuilder(
+        SAFE_MIN_BOX_VALUE>uiFeeAmount?SAFE_MIN_BOX_VALUE:uiFeeAmount,
         uiBase58PK
     )
-
+    
+    const receiversBoxes = [hodlerBox, devFeeAmount > 0n ? devFeeBox : undefined, uiFeeAmount > 0n ? uiFeeBox : undefined].filter(x => x)
 
     const unsignedMintTransaction = new TransactionBuilder(height)
+        .configureSelector((selector) => selector.ensureInclusion(buyBox.boxId))
         .from([buyBox,...utxos])
-        .to([output,devFee,uiFee])
+        .to(receiversBoxes)
         .sendChangeTo(myAddr)
-        .payFee(RECOMMENDED_MIN_FEE_VALUE * 2n)
+        .payFee(RECOMMENDED_MIN_FEE_VALUE)
         .build()
         .toEIP12Object();
 
-
-        unsignedMintTransaction.dataInputs=[oracleBox]
-        
+        unsignedMintTransaction.dataInputs=[oracleBox]        
 
     return unsignedMintTransaction
-
 }
