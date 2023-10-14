@@ -32,14 +32,14 @@
 
   const price = 1_000_000_000n;
   const tokenId = "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; // mainnet Turbo-Ergo token
-  const tokenAmount = "1"; // mainnet Turbo-Ergo token
+  const tokenAmount = "50"; // mainnet Turbo-Ergo token
   const additionalTokenId = "0fdb7ff8b37479b6eb7aab38d45af2cfeefabbefdc7eebc0348d25dd65bc2c91"; // mainnet Lambo token
   const currencyTokenId = "95823d745f7f768cfea90fd7735d44b87267a52880c56f3743b2674b0980e9e5"; // mainnet turbo-ergo token
 
 
-  const seller = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K"; // mainnet
+  const seller = "9fKtqapsSby7JFJKTvx6j4xSUT1nEFEzTrQyqZ1r6fXUrTYa7VK"; // mainnet
   const dev = "9hBdmAbDAcqzL7ZnKjxo39pbEUR5VVzQA7LHWYywdGrZDmf6x5K";    // mainnet
-  const ui = "9fKtqapsSby7JFJKTvx6j4xSUT1nEFEzTrQyqZ1r6fXUrTYa7VK";     // mainnet
+  const ui = "9ha6S6wSKnFsk3JN28HRMvHwXNKRTjMBMZUe3i4LCPnwurfDiFZ";     // mainnet
 
   onMount(doStuff);
 
