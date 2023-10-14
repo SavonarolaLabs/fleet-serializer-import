@@ -5,12 +5,12 @@ const a = `
     //val oraclePoolNFT = "0fb1eca4646950743bc5a8c341c16871a0ad9b4077e3b276bf93855d51a042d1"
     
     // Context vars set by the UI developer building the HODLBOX mint transaction
-    val hodlTargetRate : Long        = SELF.R4[Long].get
-    val maxHeight : Int              = SELF.R5[Int].get
-    val hodlerPK : SigmaProp         = SELF.R6[SigmaProp].get
+    val hodlTargetRate : Long     = SELF.R4[Long].get
+    val maxHeight : Int           = SELF.R5[Int].get
+    val hodlerPK : SigmaProp      = SELF.R6[SigmaProp].get
     val uiFeePK : SigmaProp       = SELF.R7[SigmaProp].get
     
-    val totalLockedNanoErg : Long    = SELF.value
+    val totalLockedNanoErg : Long = SELF.value
     
     val fees: Coll[(SigmaProp, BigInt)] = {
         val feeDenom : Long = 100000L
@@ -60,7 +60,8 @@ const a = `
 
     val fundsReturned : Boolean = {
         OUTPUTS(0).propositionBytes == hodlerPK.propBytes && 
-        OUTPUTS(0).value == repaymentNanoErg
+        OUTPUTS(0).value >= repaymentNanoErg &&
+        OUTPUTS(0).R4[Coll[Byte]].get == SELF.id
     }
 
     val maxHeightReached : Boolean = {
